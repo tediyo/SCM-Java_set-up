@@ -148,6 +148,8 @@
                         <include>**/*Tests.java</include>
                         <include>**/RunCucumberTest.java</include>
                     </includes>
+                    <printSummary>true</printSummary>
+                    <redirectTestOutputToFile>false</redirectTestOutputToFile>
                 </configuration>
             </plugin>
         </plugins>
