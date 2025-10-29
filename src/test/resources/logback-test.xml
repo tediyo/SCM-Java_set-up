@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Suppress verbose logging from Selenium and WebDriverManager -->
+    <logger name="org.openqa.selenium" level="WARN"/>
+    <logger name="io.github.bonigarcia" level="WARN"/>
+    <logger name="org.apache.http" level="WARN"/>
+    <logger name="org.apache.commons.beanutils" level="WARN"/>
+    <logger name="io.cucumber" level="INFO"/>
+    
+    <!-- Set root logger to WARN to suppress most debug output -->
+    <root level="WARN">
+        <appender-ref ref="STDOUT"/>
+    </root>
+    
+    <!-- Console appender -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+</configuration>
+

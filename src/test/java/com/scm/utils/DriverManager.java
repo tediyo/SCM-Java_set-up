@@ -41,7 +41,22 @@ public class DriverManager {
                 webDriver = new FirefoxDriver(firefoxOptions);
                 break;
             case "edge":
-                WebDriverManager.edgedriver().setup();
+                try {
+                    // Try to setup Edge driver
+                    WebDriverManager.edgedriver().setup();
+                } catch (Exception e) {
+                    System.err.println("ERROR: Could not download Edge driver from the internet.");
+                    System.err.println("Possible causes:");
+                    System.err.println("  1. No internet connection");
+                    System.err.println("  2. Firewall/proxy blocking access to msedgedriver.azureedge.net");
+                    System.err.println("  3. DNS resolution issues");
+                    System.err.println("\nSolutions:");
+                    System.err.println("  1. Check your internet connection");
+                    System.err.println("  2. Download EdgeDriver manually and add it to PATH:");
+                    System.err.println("     https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/");
+                    System.err.println("  3. If using a proxy, configure it in your network settings");
+                    throw new RuntimeException("Edge driver setup failed. See error messages above.", e);
+                }
                 EdgeOptions edgeOptions = new EdgeOptions();
                 // Uncomment the line below to run in headless mode
                 // edgeOptions.addArguments("--headless");
