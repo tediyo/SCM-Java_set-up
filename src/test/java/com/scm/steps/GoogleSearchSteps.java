@@ -27,7 +27,7 @@ public class GoogleSearchSteps {
     @Given("I am on the Google homepage")
     public void i_am_on_the_google_homepage() {
         driver.get("https://www.google.com");
-        // Handle cookie consent if present (different locales show different buttons)
+        // Handle cookie consentt if present (different locales show different buttons)
         try {
             WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(5));
             By[] consentSelectors = new By[] {
