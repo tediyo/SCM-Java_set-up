@@ -6,8 +6,8 @@ Feature: Ermishoe Login
   @smoke
   Scenario: Successful login with valid credentials
     Given I navigate to the Ermishoe login page
-    When I enter username "test@example.com"
-    And I enter password "password123"
+    When I enter username "thedronberhanu116@gmail.com"
+    And I enter password "ttbbss"
     And I click the login button
     Then I should be logged in successfully
     And I should see the dashboard or home page
