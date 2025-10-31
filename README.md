@@ -24,12 +24,14 @@ SCM/
         │           │   └── RunCucumberTest.java    # Test runner class
         │           ├── steps/
         │           │   ├── Hooks.java              # Before/After hooks
-        │           │   └── GoogleSearchSteps.java  # Step definitions for Google search
+        │           │   ├── GoogleSearchSteps.java  # Step definitions for Google search
+        │           │   └── ErmishoeLoginSteps.java # Step definitions for Ermishoe login
         │           └── utils/
         │               └── DriverManager.java      # WebDriver management utility
         └── resources/
             └── features/
-                └── google_search.feature           # Google search feature file
+                ├── google_search.feature           # Google search feature file
+                └── ermishoe_login.feature          # Ermishoe login feature file
 ```
 
 ## Setup Instructions
