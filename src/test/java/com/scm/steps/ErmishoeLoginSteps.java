@@ -68,36 +68,7 @@ public class ErmishoeLoginSteps {
 
     @When("I enter username {string}")
     public void i_enter_username(String username) {
-        // Try multiple selectors for username/email field
-        By[] usernameSelectors = new By[] {
-            By.id("email"),
-            By.id("username"),
-            By.name("email"),
-            By.name("username"),
-            By.cssSelector("input[type='email']"),
-            By.cssSelector("input[placeholder*='email' i]"),
-            By.cssSelector("input[placeholder*='Email' i]"),
-            By.cssSelector("input[placeholder*='username' i]"),
-            By.xpath("//input[@type='email']"),
-            By.xpath("//input[@placeholder[contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'email')]]")
-        };
-        
-        WebElement usernameField = null;
-        for (By selector : usernameSelectors) {
-            try {
-                usernameField = wait.until(ExpectedConditions.presenceOfElementLocated(selector));
-                if (usernameField.isDisplayed()) {
-                    break;
-                }
-            } catch (Exception ignore) {
-                // Try next selector
-            }
-        }
-        
-        if (usernameField == null) {
-            throw new AssertionError("Could not find username/email input field");
-        }
-        
+        WebElement usernameField = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id='email']")));
         usernameField.clear();
         usernameField.click();
         usernameField.sendKeys(username);
@@ -105,30 +76,7 @@ public class ErmishoeLoginSteps {
 
     @When("I enter password {string}")
     public void i_enter_password(String password) {
-        // Try multiple selectors for password field
-        By[] passwordSelectors = new By[] {
-            By.id("password"),
-            By.name("password"),
-            By.cssSelector("input[type='password']"),
-            By.xpath("//input[@type='password']")
-        };
-        
-        WebElement passwordField = null;
-        for (By selector : passwordSelectors) {
-            try {
-                passwordField = wait.until(ExpectedConditions.presenceOfElementLocated(selector));
-                if (passwordField.isDisplayed()) {
-                    break;
-                }
-            } catch (Exception ignore) {
-                // Try next selector
-            }
-        }
-        
-        if (passwordField == null) {
-            throw new AssertionError("Could not find password input field");
-        }
-        
+        WebElement passwordField = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id='password']")));
         passwordField.clear();
         passwordField.click();
         passwordField.sendKeys(password);
