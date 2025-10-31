@@ -96,8 +96,22 @@ mvn test -Dbrowser=edge
 
 ### Run a specific feature file
 
+- PowerShell (Windows) requires quoting `-D` properties and prefers classpath paths:
+
 ```bash
-mvn test -Dcucumber.features=src/test/resources/features/google_search.feature
+.\mvnw.cmd test "-Dcucumber.features=classpath:features/ermishoe_login.feature" "-Dbrowser=chrome"
+```
+
+- macOS/Linux:
+
+```bash
+./mvnw test -Dcucumber.features=classpath:features/google_search.feature -Dbrowser=chrome
+```
+
+- To run all tests (runner discovers features on classpath):
+
+```bash
+.\mvnw.cmd test
 ```
 
 ## Writing Features
