@@ -61,12 +61,28 @@ You can combine browser and tags:
 
 ## Viewing Test Reports
 
-After tests complete, open the HTML report:
+After tests complete, you have multiple ways to view reports:
+
+### Quick Access - Report Index
+Open the report index page for easy navigation to all reports:
 ```
-target/cucumber-reports/cucumber.html
+target/cucumber-reports/index.html
 ```
 
-Just double-click the file or open it in your browser.
+### Individual Reports
+- **HTML Report**: `target/cucumber-reports/cucumber-html-report.html` - Detailed interactive report
+- **Timeline Report**: `target/cucumber-reports/timeline/timeline.html` - Visual execution timeline
+- **JSON Report**: `target/cucumber-reports/cucumber.json` - For CI/CD integration
+- **Usage Report**: `target/cucumber-reports/cucumber-usage.json` - Performance metrics
+
+### Report Features
+- ✅ Automatic screenshots on failures
+- ✅ Scenario logs with timestamps
+- ✅ Browser information
+- ✅ Performance metrics
+- ✅ Failed test rerun file
+
+📖 See [REPORTS.md](REPORTS.md) for detailed information about all available reports.
 
 ## Common Commands Summary
 

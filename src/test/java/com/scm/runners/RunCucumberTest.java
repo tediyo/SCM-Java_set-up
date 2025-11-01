@@ -11,7 +11,13 @@ import static io.cucumber.junit.platform.engine.Constants.GLUE_PROPERTY_NAME;
 @Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features")
-@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty, html:target/cucumber-reports/cucumber.html, json:target/cucumber-reports/cucumber.json, junit:target/cucumber-reports/cucumber.xml")
+@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty," +
+        " html:target/cucumber-reports/cucumber-html-report.html," +
+        " json:target/cucumber-reports/cucumber.json," +
+        " junit:target/cucumber-reports/cucumber.xml," +
+        " timeline:target/cucumber-reports/timeline," +
+        " usage:target/cucumber-reports/cucumber-usage.json," +
+        " rerun:target/cucumber-reports/rerun.txt")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.scm.steps")
 public class RunCucumberTest {
 }

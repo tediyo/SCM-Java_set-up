@@ -148,12 +148,34 @@ public void i_am_on_the_google_homepage() {
 
 ## Test Reports
 
-After running tests, reports are generated in:
-- HTML Report: `target/cucumber-reports/cucumber.html`
-- JSON Report: `target/cucumber-reports/cucumber.json`
-- JUnit XML: `target/cucumber-reports/cucumber.xml`
+### Enhanced Reporting System
 
-To view the HTML report, open `target/cucumber-reports/cucumber.html` in your browser.
+After running tests, multiple comprehensive reports are generated in `target/cucumber-reports/`:
+
+- **HTML Report**: `cucumber-html-report.html` - Interactive report with screenshots, logs, and detailed results
+- **Timeline Report**: `timeline/timeline.html` - Visual timeline showing execution flow
+- **JSON Report**: `cucumber.json` - Machine-readable format for CI/CD integration
+- **JUnit XML**: `cucumber.xml` - Standard XML format for build tools
+- **Usage Report**: `cucumber-usage.json` - Performance metrics and step execution times
+- **Rerun File**: `rerun.txt` - List of failed scenarios for easy rerunning
+- **Report Index**: `index.html` - Central hub to access all reports
+
+### Quick Access
+
+- **View all reports**: Open `target/cucumber-reports/index.html` in your browser
+- **Main HTML report**: Open `target/cucumber-reports/cucumber-html-report.html`
+- **Timeline visualization**: Open `target/cucumber-reports/timeline/timeline.html`
+
+### Report Features
+
+- ✅ Automatic screenshot capture on test failures
+- ✅ Detailed scenario logs with timestamps
+- ✅ Browser information tracking
+- ✅ Performance metrics and execution times
+- ✅ Visual timeline for parallel execution
+- ✅ Failed test rerun file generation
+
+📖 For detailed information about reports, see [REPORTS.md](REPORTS.md)
 
 ## Key Components
 
@@ -165,7 +187,9 @@ Manages WebDriver instances and supports multiple browsers (Chrome, Firefox, Edg
 
 Contains `@Before` and `@After` hooks that:
 - Initialize the WebDriver before each scenario
-- Take screenshots on test failure
+- Log scenario start time and browser information
+- Take screenshots on test failure with timestamped names
+- Log scenario completion time and status
 - Clean up the WebDriver after each scenario
 
 ### Test Runner
