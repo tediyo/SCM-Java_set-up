@@ -85,4 +85,8 @@ public class DriverManager {
             driver.close();
         }
     }
+
+    public static String getBrowserName() {
+        return browserName;
+    }
 }
