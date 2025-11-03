@@ -20,8 +20,8 @@ public class GoogleSearchSteps {
     private WebDriverWait wait;
     private long pageLoadStartTime;
     private long pageLoadEndTime;
-    private long searchStartTime;
-    private long searchEndTime;
+    private long searchStartTime = 0;
+    private long searchEndTime = 0;
 
     public GoogleSearchSteps() {
         this.driver = DriverManager.getDriver();
@@ -181,6 +181,10 @@ public class GoogleSearchSteps {
 
     @Then("the search response time should be less than {int} seconds")
     public void the_search_response_time_should_be_less_than_seconds(int maxSeconds) {
+        if (searchStartTime == 0 || searchEndTime == 0) {
+            throw new AssertionError("Search was not performed. Cannot measure search response time.");
+        }
+        
         long searchResponseTime = searchEndTime - searchStartTime;
         long maxTimeMillis = maxSeconds * 1000L;
         
@@ -192,6 +196,10 @@ public class GoogleSearchSteps {
 
     @Then("the total time should be less than {int} seconds")
     public void the_total_time_should_be_less_than_seconds(int maxSeconds) {
+        if (searchStartTime == 0 || searchEndTime == 0) {
+            throw new AssertionError("Search was not performed. Cannot measure total execution time.");
+        }
+        
         long totalTime = searchEndTime - pageLoadStartTime;
         long maxTimeMillis = maxSeconds * 1000L;
         
@@ -206,13 +214,21 @@ public class GoogleSearchSteps {
     @Then("I should see performance metrics")
     public void i_should_see_performance_metrics() {
         long pageLoadTime = pageLoadEndTime - pageLoadStartTime;
-        long searchResponseTime = searchEndTime - searchStartTime;
-        long totalTime = searchEndTime - pageLoadStartTime;
         
         System.out.println("\n=== Performance Metrics ===");
         System.out.println("Page Load Time: " + (pageLoadTime / 1000.0) + " seconds");
-        System.out.println("Search Response Time: " + (searchResponseTime / 1000.0) + " seconds");
-        System.out.println("Total Execution Time: " + (totalTime / 1000.0) + " seconds");
+        
+        // Only calculate search metrics if search was performed
+        if (searchStartTime > 0 && searchEndTime > 0) {
+            long searchResponseTime = searchEndTime - searchStartTime;
+            long totalTime = searchEndTime - pageLoadStartTime;
+            System.out.println("Search Response Time: " + (searchResponseTime / 1000.0) + " seconds");
+            System.out.println("Total Execution Time: " + (totalTime / 1000.0) + " seconds");
+        } else {
+            System.out.println("Search Response Time: N/A (no search performed)");
+            System.out.println("Total Execution Time: N/A (no search performed)");
+        }
+        
         System.out.println("==========================\n");
         
         // Just log, don't fail - useful for monitoring

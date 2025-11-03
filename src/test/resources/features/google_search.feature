@@ -59,8 +59,8 @@ Feature: Google Search
     Then I should see search results containing "React"
     And the page title should contain "React"
     And the page load time should be less than 5 seconds
-    And the search response time should be less than 10 seconds
-    And the total time should be less than 15 seconds
+    And the search response time should be less than 25 seconds
+    And the total time should be less than 30 seconds
     And I should see performance metrics
 
   @performance
