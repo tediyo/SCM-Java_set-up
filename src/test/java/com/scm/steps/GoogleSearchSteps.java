@@ -18,6 +18,10 @@ import java.util.stream.Collectors;
 public class GoogleSearchSteps {
     private WebDriver driver;
     private WebDriverWait wait;
+    private long pageLoadStartTime;
+    private long pageLoadEndTime;
+    private long searchStartTime;
+    private long searchEndTime;
 
     public GoogleSearchSteps() {
         this.driver = DriverManager.getDriver();
@@ -26,7 +30,9 @@ public class GoogleSearchSteps {
 
     @Given("I am on the Google homepage")
     public void i_am_on_the_google_homepage() {
+        pageLoadStartTime = System.currentTimeMillis();
         driver.get("https://www.google.com");
+        pageLoadEndTime = System.currentTimeMillis();
         // Handle cookie consent  if present (different locales show different buttons)
         try {
             WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(5));
@@ -77,6 +83,9 @@ public class GoogleSearchSteps {
             throw new AssertionError("Could not find Google search box.");
         }
 
+        // Start timing the search operation
+        searchStartTime = System.currentTimeMillis();
+        
         try {
             // Ensure focus before typing
             searchBox.click();
@@ -92,6 +101,20 @@ public class GoogleSearchSteps {
             retryBox.sendKeys(searchTerm);
             retryBox.submit();
         }
+        
+        // Wait for results page to load and mark end time
+        WebDriverWait extendedWait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        try {
+            extendedWait.until(ExpectedConditions.or(
+                    ExpectedConditions.presenceOfElementLocated(By.cssSelector("#rso")),
+                    ExpectedConditions.presenceOfElementLocated(By.cssSelector("#search")),
+                    ExpectedConditions.presenceOfElementLocated(By.cssSelector("h3"))
+            ));
+        } catch (Exception ignore) {
+            // proceed even if timeout
+        }
+        
+        searchEndTime = System.currentTimeMillis();
     }
 
     @Then("I should see search results containing {string}")
@@ -141,5 +164,57 @@ public class GoogleSearchSteps {
         String actualTitle = driver.getTitle();
         Assert.assertTrue("Page title should contain: " + expectedTitle, 
                 actualTitle.toLowerCase().contains(expectedTitle.toLowerCase()));
+    }
+
+    // Performance testing steps
+    
+    @Then("the page load time should be less than {int} seconds")
+    public void the_page_load_time_should_be_less_than_seconds(int maxSeconds) {
+        long pageLoadTime = pageLoadEndTime - pageLoadStartTime;
+        long maxTimeMillis = maxSeconds * 1000L;
+        
+        System.out.println("Page load time: " + (pageLoadTime / 1000.0) + " seconds");
+        
+        Assert.assertTrue("Page load time (" + (pageLoadTime / 1000.0) + "s) should be less than " + maxSeconds + " seconds", 
+                pageLoadTime < maxTimeMillis);
+    }
+
+    @Then("the search response time should be less than {int} seconds")
+    public void the_search_response_time_should_be_less_than_seconds(int maxSeconds) {
+        long searchResponseTime = searchEndTime - searchStartTime;
+        long maxTimeMillis = maxSeconds * 1000L;
+        
+        System.out.println("Search response time: " + (searchResponseTime / 1000.0) + " seconds");
+        
+        Assert.assertTrue("Search response time (" + (searchResponseTime / 1000.0) + "s) should be less than " + maxSeconds + " seconds", 
+                searchResponseTime < maxTimeMillis);
+    }
+
+    @Then("the total time should be less than {int} seconds")
+    public void the_total_time_should_be_less_than_seconds(int maxSeconds) {
+        long totalTime = searchEndTime - pageLoadStartTime;
+        long maxTimeMillis = maxSeconds * 1000L;
+        
+        System.out.println("Total execution time: " + (totalTime / 1000.0) + " seconds");
+        System.out.println("  - Page load: " + ((pageLoadEndTime - pageLoadStartTime) / 1000.0) + " seconds");
+        System.out.println("  - Search operation: " + ((searchEndTime - searchStartTime) / 1000.0) + " seconds");
+        
+        Assert.assertTrue("Total time (" + (totalTime / 1000.0) + "s) should be less than " + maxSeconds + " seconds", 
+                totalTime < maxTimeMillis);
+    }
+
+    @Then("I should see performance metrics")
+    public void i_should_see_performance_metrics() {
+        long pageLoadTime = pageLoadEndTime - pageLoadStartTime;
+        long searchResponseTime = searchEndTime - searchStartTime;
+        long totalTime = searchEndTime - pageLoadStartTime;
+        
+        System.out.println("\n=== Performance Metrics ===");
+        System.out.println("Page Load Time: " + (pageLoadTime / 1000.0) + " seconds");
+        System.out.println("Search Response Time: " + (searchResponseTime / 1000.0) + " seconds");
+        System.out.println("Total Execution Time: " + (totalTime / 1000.0) + " seconds");
+        System.out.println("==========================\n");
+        
+        // Just log, don't fail - useful for monitoring
     }
 }
