@@ -24,6 +24,7 @@ Feature: Google Search
     Then I should see search results containing "C#"
     And the page title should contain "C#"
 
+
   @critical
   Scenario: Search for popular term - "Python tutorial"
     Given I am on the Google homepage
@@ -31,12 +32,14 @@ Feature: Google Search
     Then I should see search results containing "Python"
     And the page title should contain "Python"
 
+
   @edge-case
   Scenario: Search for long phrase
     Given I am on the Google homepage
     When I search for "how to learn web automation testing with Selenium"
     Then I should see search results containing "Selenium"
     And the page title should contain "Selenium"
+
 
   @ui
   Scenario: Verify search results page displays correctly
