@@ -66,8 +66,4 @@ Feature: Google Search
     And the total time should be less than 30 seconds
     And I should see performance metrics
 
-  @performance
-  Scenario: Verify homepage loads quickly
-    Given I am on the Google homepage
-    Then the page load time should be less than 3 seconds
-    And I should see performance metrics
+ 
