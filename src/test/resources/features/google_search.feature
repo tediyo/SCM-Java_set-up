@@ -51,7 +51,7 @@ Feature: Google Search
   @negative
   Scenario: Search for non-existent term still shows results
     Given I am on the Google homepage
-    When I search for "xyzabc123nonexistent"
+    When I search for "xyzabc123nonexisent"
     Then I should see search results
     And the page title should contain "xyzabc123nonexisent"
 
