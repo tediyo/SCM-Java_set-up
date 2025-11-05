@@ -53,7 +53,7 @@ Feature: Google Search
     Given I am on the Google homepage
     When I search for "xyzabc123nonexistent"
     Then I should see search results
-    And the page title should contain "xyzabc123nonexistent"
+    And the page title should contain "xyzabc123nonexisent"
 
   @performance
   Scenario: Search response time is acceptable
