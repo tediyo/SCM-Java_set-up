@@ -66,4 +66,75 @@ Feature: Google Search
     And the total time should be less than 30 seconds
     And I should see performance metrics
 
+  @negative
+  Scenario: Empty search query handling
+    Given I am on the Google homepage
+    When I search for ""
+    Then I should remain on the Google homepage
+    And the search box should be empty
+
+  @edge-case
+  Scenario: Search with numbers only
+    Given I am on the Google homepage
+    When I search for "12345"
+    Then I should see search results
+    And the page title should contain "12345"
+
+  @regression
+  Scenario: Search with search operators - exact phrase
+    Given I am on the Google homepage
+    When I search for "\"Selenium WebDriver\""
+    Then I should see search results containing "Selenium"
+    And the page title should contain "Selenium"
+
+  @ui
+  Scenario: Verify search suggestions appear while typing
+    Given I am on the Google homepage
+    When I type "selenium" in the search box
+    Then I should see search suggestions dropdown
+
+  @functional
+  Scenario: Clear search box functionality
+    Given I am on the Google homepage
+    When I type "test query" in the search box
+    And I clear the search box
+    Then the search box should be empty
+
+  @functional
+  Scenario: Multiple consecutive searches
+    Given I am on the Google homepage
+    When I search for "Python"
+    Then I should see search results containing "Python"
+    When I search for "Java"
+    Then I should see search results containing "Java"
+    When I search for "JavaScript"
+    Then I should see search results containing "JavaScript"
+
+  @edge-case
+  Scenario: Search with very short query
+    Given I am on the Google homepage
+    When I search for "AI"
+    Then I should see search results containing "AI"
+    And the page title should contain "AI"
+
+  @regression
+  Scenario: Search with mixed case query
+    Given I am on the Google homepage
+    When I search for "SeLeNiUm TeStInG"
+    Then I should see search results containing "Selenium"
+    And the page title should contain "Selenium"
+
+  @edge-case
+  Scenario: Search with URL-like query
+    Given I am on the Google homepage
+    When I search for "www.google.com"
+    Then I should see search results
+    And the page title should contain "google.com"
+
+  @functional
+  Scenario: Search result count verification
+    Given I am on the Google homepage
+    When I search for "automation testing"
+    Then I should see at least 1 search result
+    And I should see search results containing "automation"
  
