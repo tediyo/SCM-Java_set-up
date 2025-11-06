@@ -90,6 +90,13 @@ public class GoogleSearchSteps {
             // Ensure focus before typing
             searchBox.click();
             searchBox.clear();
+            
+            // Handle empty search - just clear and don't submit
+            if (searchTerm == null || searchTerm.trim().isEmpty()) {
+                searchEndTime = System.currentTimeMillis();
+                return; // Don't submit empty search
+            }
+            
             searchBox.sendKeys(searchTerm);
             searchBox.submit();
         } catch (Exception e) {
@@ -98,6 +105,13 @@ public class GoogleSearchSteps {
                     searchBox.getTagName().equalsIgnoreCase("textarea") ? By.cssSelector("textarea[name='q']") : By.cssSelector("input[name='q']")));
             retryBox.click();
             retryBox.clear();
+            
+            // Handle empty search - just clear and don't submit
+            if (searchTerm == null || searchTerm.trim().isEmpty()) {
+                searchEndTime = System.currentTimeMillis();
+                return; // Don't submit empty search
+            }
+            
             retryBox.sendKeys(searchTerm);
             retryBox.submit();
         }
@@ -232,5 +246,196 @@ public class GoogleSearchSteps {
         System.out.println("==========================\n");
         
         // Just log, don't fail - useful for monitoring
+    }
+
+    // Helper method to get search box element
+    private WebElement getSearchBox() {
+        By[] searchSelectors = new By[] {
+                By.cssSelector("input[name='q']"),
+                By.cssSelector("textarea[name='q']")
+        };
+
+        for (By selector : searchSelectors) {
+            try {
+                WebElement searchBox = wait.until(ExpectedConditions.visibilityOfElementLocated(selector));
+                wait.until(ExpectedConditions.elementToBeClickable(searchBox));
+                return searchBox;
+            } catch (Exception ignore) {
+                // try next selector
+            }
+        }
+        throw new AssertionError("Could not find Google search box.");
+    }
+
+    @When("I type {string} in the search box")
+    public void i_type_in_the_search_box(String text) {
+        WebElement searchBox = getSearchBox();
+        try {
+            searchBox.click();
+            searchBox.clear();
+            searchBox.sendKeys(text);
+            // Wait a bit for suggestions to appear
+            Thread.sleep(500);
+        } catch (Exception e) {
+            // Retry once in case of overlays or stale elements
+            WebElement retryBox = getSearchBox();
+            retryBox.click();
+            retryBox.clear();
+            retryBox.sendKeys(text);
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    @Then("I should see search suggestions dropdown")
+    public void i_should_see_search_suggestions_dropdown() {
+        // Google search suggestions appear in various selectors
+        By[] suggestionSelectors = new By[] {
+                By.cssSelector("ul[role='listbox']"),
+                By.cssSelector("div[role='listbox']"),
+                By.cssSelector("ul.erkvQe"),
+                By.cssSelector("div.sbct"),
+                By.xpath("//ul[@role='listbox']//li"),
+                By.xpath("//div[@role='listbox']//div[@role='option']")
+        };
+
+        boolean suggestionsFound = false;
+        for (By selector : suggestionSelectors) {
+            try {
+                WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(2));
+                List<WebElement> suggestions = shortWait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(selector));
+                if (!suggestions.isEmpty() && suggestions.get(0).isDisplayed()) {
+                    suggestionsFound = true;
+                    break;
+                }
+            } catch (Exception ignore) {
+                // try next selector
+            }
+        }
+
+        Assert.assertTrue("Search suggestions dropdown should be visible", suggestionsFound);
+    }
+
+    @Then("I should remain on the Google homepage")
+    public void i_should_remain_on_the_google_homepage() {
+        String currentUrl = driver.getCurrentUrl();
+        // Google homepage URLs can be various formats
+        boolean isHomepage = currentUrl.equals("https://www.google.com/") ||
+                            currentUrl.equals("https://www.google.com") ||
+                            currentUrl.startsWith("https://www.google.com/?") ||
+                            currentUrl.startsWith("https://www.google.com/webhp");
+        
+        Assert.assertTrue("Should remain on Google homepage, but current URL is: " + currentUrl, isHomepage);
+    }
+
+    @Then("the search box should be empty")
+    public void the_search_box_should_be_empty() {
+        WebElement searchBox = getSearchBox();
+        String value = searchBox.getAttribute("value");
+        if (value == null) {
+            value = searchBox.getText();
+        }
+        Assert.assertTrue("Search box should be empty, but contains: " + value, 
+                value == null || value.trim().isEmpty());
+    }
+
+    @When("I clear the search box")
+    public void i_clear_the_search_box() {
+        WebElement searchBox = getSearchBox();
+        try {
+            searchBox.click();
+            searchBox.clear();
+            // Also try using keyboard shortcuts or clear button if available
+            By[] clearButtonSelectors = new By[] {
+                    By.cssSelector("button[aria-label='Clear']"),
+                    By.cssSelector("span[aria-label='Clear']"),
+                    By.xpath("//button[contains(@aria-label, 'Clear')]")
+            };
+            for (By selector : clearButtonSelectors) {
+                try {
+                    WebElement clearBtn = driver.findElement(selector);
+                    if (clearBtn.isDisplayed()) {
+                        clearBtn.click();
+                        break;
+                    }
+                } catch (Exception ignore) {
+                    // try next selector
+                }
+            }
+        } catch (Exception e) {
+            // Retry once
+            WebElement retryBox = getSearchBox();
+            retryBox.click();
+            retryBox.clear();
+        }
+    }
+
+    @Then("I should see at least {int} search result")
+    public void i_should_see_at_least_search_result(int minCount) {
+        // Wait for the search results page to load completely
+        WebDriverWait extendedWait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        try {
+            extendedWait.until(ExpectedConditions.or(
+                    ExpectedConditions.presenceOfElementLocated(By.cssSelector("#rso")),
+                    ExpectedConditions.presenceOfElementLocated(By.cssSelector("#search")),
+                    ExpectedConditions.presenceOfElementLocated(By.cssSelector("h3"))
+            ));
+        } catch (Exception ignore) {
+            // proceed to attempt collecting results
+        }
+
+        // Try multiple selector strategies for Google results
+        List<WebElement> results = driver.findElements(By.cssSelector("#rso h3, #search h3, div.g h3, a h3"));
+        
+        // Get all visible h3 elements with text
+        List<String> resultTexts = results.stream()
+                .filter(element -> {
+                    try {
+                        return element.isDisplayed() && !element.getText().trim().isEmpty();
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
+                .map(WebElement::getText)
+                .collect(Collectors.toList());
+        
+        Assert.assertTrue("Should see at least " + minCount + " search result(s), but found " + resultTexts.size(),
+                resultTexts.size() >= minCount);
+    }
+
+    @Then("I should see search results")
+    public void i_should_see_search_results() {
+        // Wait for the search results page to load completely
+        WebDriverWait extendedWait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        try {
+            extendedWait.until(ExpectedConditions.or(
+                    ExpectedConditions.presenceOfElementLocated(By.cssSelector("#rso")),
+                    ExpectedConditions.presenceOfElementLocated(By.cssSelector("#search")),
+                    ExpectedConditions.presenceOfElementLocated(By.cssSelector("h3"))
+            ));
+        } catch (Exception ignore) {
+            // proceed to attempt collecting results
+        }
+
+        // Try multiple selector strategies for Google results
+        List<WebElement> results = driver.findElements(By.cssSelector("#rso h3, #search h3, div.g h3, a h3"));
+        
+        // Get all visible h3 elements with text
+        List<String> resultTexts = results.stream()
+                .filter(element -> {
+                    try {
+                        return element.isDisplayed() && !element.getText().trim().isEmpty();
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
+                .map(WebElement::getText)
+                .collect(Collectors.toList());
+        
+        Assert.assertTrue("Should see search results, but found " + resultTexts.size() + " results",
+                !resultTexts.isEmpty());
     }
 }
