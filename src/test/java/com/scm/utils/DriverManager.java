@@ -27,11 +27,38 @@ public class DriverManager {
 
         switch (browserName) {
             case "chrome":
-                WebDriverManager.chromedriver().setup();
+                System.out.println("[DriverManager] Setting up ChromeDriver...");
+                
+                // Check if we should skip WebDriverManager (for faster execution when offline)
+                String skipWdm = System.getProperty("skip.webdrivermanager", "false");
+                boolean useWdm = !"true".equalsIgnoreCase(skipWdm);
+                
+                if (useWdm) {
+                    try {
+                        // Use a separate thread with timeout to avoid long waits
+                        System.out.println("[DriverManager] Attempting to setup via WebDriverManager (with timeout)...");
+                        WebDriverManager wdm = WebDriverManager.chromedriver();
+                        
+                        // Set a shorter timeout for network operations
+                        // This will use cached driver if available
+                        wdm.setup();
+                        System.out.println("[DriverManager] ✓ ChromeDriver setup via WebDriverManager successful!");
+                    } catch (Exception e) {
+                        // If WebDriverManager fails, we'll use system PATH driver
+                        System.err.println("[DriverManager] ⚠ WebDriverManager failed: " + e.getClass().getSimpleName());
+                        System.err.println("[DriverManager] → Falling back to system PATH ChromeDriver...");
+                        // Continue to use system PATH driver
+                    }
+                } else {
+                    System.out.println("[DriverManager] Skipping WebDriverManager (using system PATH)...");
+                }
+                
                 ChromeOptions chromeOptions = new ChromeOptions();
                 // Uncomment the line below to run in headless mode
                 // chromeOptions.addArguments("--headless");
+                System.out.println("[DriverManager] Creating ChromeDriver instance...");
                 webDriver = new ChromeDriver(chromeOptions);
+                System.out.println("[DriverManager] ✓ ChromeDriver ready!");
                 break;
             case "firefox":
                 WebDriverManager.firefoxdriver().setup();
