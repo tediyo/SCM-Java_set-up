@@ -1,6 +1,7 @@
 package com.scm.utils;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -141,6 +142,15 @@ public class DriverManager {
                 chromeOptions.addArguments("--disable-dev-shm-usage");
                 chromeOptions.addArguments("--disable-gpu");
                 chromeOptions.addArguments("--disable-blink-features=AutomationControlled");
+                // Additional options for better stability with slow-loading pages
+                chromeOptions.addArguments("--disable-extensions");
+                chromeOptions.addArguments("--disable-web-security");
+                chromeOptions.addArguments("--allow-running-insecure-content");
+                chromeOptions.addArguments("--ignore-certificate-errors");
+                chromeOptions.addArguments("--ignore-ssl-errors");
+                chromeOptions.addArguments("--ignore-certificate-errors-spki-list");
+                // Set page load strategy to 'normal' for better compatibility
+                chromeOptions.setPageLoadStrategy(PageLoadStrategy.NORMAL);
                 
                 // If Chrome path was found, explicitly set it
                 if (chromePath != null) {
@@ -208,7 +218,8 @@ public class DriverManager {
 
         webDriver.manage().window().maximize();
         webDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-        webDriver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
+        // Increased page load timeout for slow-loading pages (e.g., IMDS)
+        webDriver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(120));
 
         return webDriver;
     }
