@@ -38,7 +38,7 @@ public class ImdsLoginSteps {
             // Check if we're on the page by checking current URL
             String currentUrl = driver.getCurrentUrl();
             if (!currentUrl.contains("imds")) {
-                throw new RuntimeException("Failed to navigate to IMDS login page. Current URL: " + currentUrl, e);
+                throw new RuntimeException("Failed to navigate to IMDS  login page. Current URL: " + currentUrl, e);
             }
         }
         
