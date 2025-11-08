@@ -58,6 +58,44 @@ public class ImdsLoginSteps {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+        
+        // Click the lightbox button if it appears
+        try {
+            WebElement lightboxButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//*[@id=\"lightbox\"]/div[1]/div/div[2]/div/button")));
+            if (lightboxButton.isDisplayed()) {
+                lightboxButton.click();
+                System.out.println("Clicked lightbox button");
+                // Wait a moment for the lightbox to close
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        } catch (Exception e) {
+            // Lightbox button not found or not visible, continue
+            System.out.println("Lightbox button not found or not visible, continuing...");
+        }
+        
+        // Click the PKI login button
+        try {
+            WebElement pkiLoginButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//*[@id=\"pki-login\"]")));
+            if (pkiLoginButton.isDisplayed()) {
+                pkiLoginButton.click();
+                System.out.println("Clicked PKI login button");
+                // Wait a moment for any transition
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        } catch (Exception e) {
+            // PKI login button not found or not visible, continue
+            System.out.println("PKI login button not found or not visible, continuing...");
+        }
     }
 
     @When("I enter terminal ID {string}")
